@@ -1,9 +1,3 @@
-# =============================================================================
-# SmartGen Showcase CI & Deploy Pipeline
-# Author: Sayad Md Bayezid Hosan
-# Repository: https://github.com/bayeziddev/Material-smartgen
-# =============================================================================
-
 name: SmartGen Showcase CI & Deploy
 
 on:
@@ -59,7 +53,7 @@ jobs:
 
       - name: Validate Configuration
         run: |
-          echo "Checking SmartGen showcase configuration..."
+          echo "Checking SmartGen configuration..."
           if [ -f smartgen.yml ] || [ -f SmartGen.yml ]; then
             echo "✔ Configuration file found"
           else
@@ -67,12 +61,20 @@ jobs:
             exit 1
           fi
 
+      - name: Validate Project Folders
+        run: |
+          if [ ! -d showcase ] && [ ! -d materials ]; then
+            echo "Showcase or materials folder not found"
+            exit 1
+          fi
+          echo "Project folder structure verified."
+
       - name: Validate Markdown Files
         run: |
-          COUNT=$(find . -name "*.md" -o -name "*.html" | wc -l)
-          echo "Content files found: $COUNT"
+          COUNT=$(find . -name "*.md" | wc -l)
+          echo "Markdown files found: $COUNT"
           if [ "$COUNT" -eq "0" ]; then
-            echo "No content files found."
+            echo "No markdown files found in the project."
             exit 1
           fi
 
@@ -98,7 +100,7 @@ jobs:
           fi
           pip install .
 
-      - name: Build Showcase Site
+      - name: Build Showcase
         run: |
           echo "Building SmartGen Showcase..."
           smartgen-showcase build
@@ -109,6 +111,7 @@ jobs:
             echo "Build failed: 'site' directory not generated."
             exit 1
           fi
+          # Touch .nojekyll to ensure GitHub Pages serves underscore assets properly
           touch site/.nojekyll
           echo "Build successful. Added .nojekyll flag."
 
@@ -153,4 +156,4 @@ jobs:
           echo "Commit: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
           echo "Triggered by: $GITHUB_ACTOR" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Status: Showcase pipeline execution finished." >> $GITHUB_STEP_SUMMARY
+          echo "Status: Workflow execution finished." >> $GITHUB_STEP_SUMMARY
