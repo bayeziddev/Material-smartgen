@@ -22,10 +22,10 @@
 # Modern Open-Source Showcase and Portfolio Framework
 #
 # Repository:
-# https://github.com/bayeziddev/smartGenShowcase
+# https://github.com/bayeziddev/Material-smartgen
 #
 # Website:
-# https://showcase.smartgentools.com
+# https://github.com/bayeziddev/Material-smartgen/
 #
 # Author:
 # Sayad Md Bayezid Hosan
