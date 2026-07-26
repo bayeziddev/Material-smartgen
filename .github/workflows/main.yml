@@ -1,7 +1,7 @@
 # =============================================================================
 # SmartGen Showcase Engine Core logic with HTML, Markdown, YAML, and JSON support
 # Author: Sayad Md Bayezid Hosan
-# Repository: https://github.com/bayeziddev/smartGenShowcase
+# Repository: https://github.com/bayeziddev/Material-smartgen
 # =============================================================================
 
 import os
@@ -11,6 +11,7 @@ import markdown2
 from pathlib import Path
 
 class SmartGenEngine:
+    """Core engine to parse configuration and render multi-format files."""
     def __init__(self, config_path="smartgen.yml"):
         self.config_path = config_path
         self.config = self.load_config()
