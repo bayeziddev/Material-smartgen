@@ -1,5 +1,5 @@
 """
-Core: Main documentation builder for SmartGen Docs.
+Core: Main static site engine for SmartGen Showcase.
 
 This module handles the conversion of Markdown files to HTML pages,
 using the PathResolver to ensure all links are correct across nested directories.
@@ -13,14 +13,14 @@ from .converter import MarkdownConverter
 from .path_resolver import PathResolver
 
 
-class Builder:
+class SmartGenEngine:
     """
-    Builds the documentation site from Markdown files.
+    Builds the showcase site from Markdown content files.
     """
     
     def __init__(self, config_path='smartgen.yml', site_dir='site'):
         """
-        Initialize the Builder.
+        Initialize the Engine.
         
         Args:
             config_path: Path to the smartgen.yml configuration file
@@ -29,7 +29,11 @@ class Builder:
         self.config_path = config_path
         self.site_dir = site_dir
         self.config = self.load_config()
-        self.docs_dir = 'docs'
+        
+        # Changed to '.' (root) because your showcase folders (showcase/, materials/, etc.) 
+        # and index.md are generated directly in the repository root.
+        self.docs_dir = '.' 
+        
         self.theme_dir = os.path.join(os.path.dirname(__file__), 'themes', 'default')
         self.converter = MarkdownConverter()
         self.env = Environment(loader=FileSystemLoader(self.theme_dir))
@@ -41,28 +45,22 @@ class Builder:
     def load_config(self):
         """Load the smartgen.yml configuration."""
         if not os.path.exists(self.config_path):
-            return {"site_name": "SmartGen Docs", "nav": []}
-        with open(self.config_path, 'r') as f:
+            return {"site_name": "SmartGen Showcase", "nav": []}
+        with open(self.config_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
 
-    def build(self):
-        """Build the entire documentation site."""
+    def process_content_files(self):
+        """Build the entire showcase site. (Called by cli.py)"""
         # Clear and create site directory
         if os.path.exists(self.site_dir):
             shutil.rmtree(self.site_dir)
         os.makedirs(self.site_dir)
 
         # Tell GitHub Pages not to run its own Jekyll build over this output.
-        # Without this, GitHub Pages can silently fall back to auto-generating
-        # a Jekyll site from README.md whenever the Pages source is set to
-        # "Deploy from a branch" instead of "GitHub Actions".
         with open(os.path.join(self.site_dir, '.nojekyll'), 'w') as f:
             pass
 
-        # Persist the custom domain across every deploy. Without this file in
-        # the build artifact, an Actions-based Pages deployment can silently
-        # drop a custom domain that was only ever set through the repo's
-        # Settings UI.
+        # Persist the custom domain across every deploy.
         site_url = self.config.get('site_url', '')
         if site_url:
             domain = site_url.replace('https://', '').replace('http://', '').split('/')[0]
@@ -79,10 +77,7 @@ class Builder:
         # Build pages with support for nested navigation
         nav = self.config.get('nav', [])
 
-        # Flatten nav into an ordered sequence of real (title, md_path) pages,
-        # in the same order they appear in the sidebar. This lets us compute
-        # real, server-rendered Previous/Next links per page instead of
-        # relying on client-side JS to fill them in after the fact.
+        # Flatten nav into an ordered sequence of real (title, md_path) pages
         self.page_sequence = []
 
         def flatten_nav(nav_list):
@@ -120,7 +115,7 @@ class Builder:
         
         Args:
             title: Title of the page
-            md_path: Path to the Markdown file (relative to docs_dir)
+            md_path: Path to the Markdown file
         """
         # Skip external URLs
         if md_path.startswith('http://') or md_path.startswith('https://'):
@@ -150,7 +145,7 @@ class Builder:
             {"title": title, "link": relative_path}
         ]
 
-        # Real, server-rendered previous/next links (same order as the sidebar)
+        # Real, server-rendered previous/next links
         prev_page, next_page = None, None
         sequence = getattr(self, 'page_sequence', [])
         for i, (seq_title, seq_path) in enumerate(sequence):
