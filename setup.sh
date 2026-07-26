@@ -1,13 +1,16 @@
 #!/bin/bash
 
-# This script automates the setup and installation of SmartGen Docs.
+# =============================================================================
+# SmartGen Showcase - Local Setup Script
+# Author: Sayad Md Bayezid Hosan
+# =============================================================================
 
-echo "Starting SmartGen Docs setup..."
+echo "Starting SmartGen Showcase setup..."
 
 # Check for Python 3
 if ! command -v python3 &> /dev/null
 then
-    echo "Python 3 is not installed. Please install Python 3 to proceed."
+    echo "Error: Python 3 is not installed. Please install Python 3 to proceed."
     exit 1
 fi
 
@@ -18,29 +21,36 @@ then
     sudo apt-get update
     sudo apt-get install -y python3-pip
     if [ $? -ne 0 ]; then
-        echo "Failed to install pip3. Please install it manually."
+        echo "Error: Failed to install pip3. Please install it manually."
         exit 1
     fi
 fi
 
-echo "Installing SmartGen Docs and its dependencies..."
-pip3 install --user markdown2 Jinja2 PyYAML click watchdog fastapi uvicorn
+echo "Installing SmartGen Showcase and its dependencies..."
+# The "-e ." flag installs your local project in editable mode, 
+# reading dependencies directly from your pyproject.toml or requirements.txt
+pip3 install --user -e .
 
 if [ $? -ne 0 ]; then
-    echo "Failed to install SmartGen Docs dependencies. Please check the error messages above."
+    echo "Error: Failed to install SmartGen Showcase. Please check the logs above."
     exit 1
 fi
 
-echo "SmartGen Docs installed successfully!"
-echo "You can now use the 'smartgen-docs' command."
-echo "To initialize a new project: smartgen-docs init"
-echo "To build your documentation: smartgen-docs build"
-echo "To start a development server: smartgen-docs serve"
+echo "============================================================"
+echo "✔ SmartGen Showcase installed successfully!"
+echo "============================================================"
+echo "You can now use the 'smartgen-showcase' CLI command."
+echo ""
+echo "Common Commands:"
+echo "  Initialize a new project:  smartgen-showcase init"
+echo "  Build your showcase:       smartgen-showcase build"
+echo "  Start a dev server:        smartgen-showcase serve"
+echo ""
 
-# Add smartgen-docs to PATH if not already there (for current session)
-# This might be needed if --user installation directory is not in PATH
+# Add ~/.local/bin to PATH if not already there (for current session)
 if [[ ":$PATH:" != *":${HOME}/.local/bin:"* ]]; then
-    echo "Adding ~/.local/bin to PATH for current session. You might want to add it permanently."
+    echo "Notice: Adding ~/.local/bin to PATH for the current session."
+    echo "Tip: You may want to add 'export PATH=\"\$HOME/.local/bin:\$PATH\"' to your ~/.bashrc or ~/.zshrc permanently."
     export PATH="${HOME}/.local/bin:$PATH"
 fi
 
