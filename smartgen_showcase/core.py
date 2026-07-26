@@ -1,8 +1,8 @@
 """
-Core: Main static site engine for SmartGen Showcase.
+Core: Main documentation builder for SmartGen Showcase.
 
 This module handles the conversion of Markdown files to HTML pages,
-ensuring all links are correct across nested directories without needing external modules.
+using the PathResolver to ensure all links are correct across nested directories.
 """
 
 import os
@@ -10,61 +10,33 @@ import yaml
 import shutil
 from jinja2 import Environment, FileSystemLoader
 from .converter import MarkdownConverter
-
-# ==========================================
-# যুক্ত করা হয়েছে: PathResolver ক্লাস
-# (এর ফলে আলাদা path_resolver.py ফাইলের আর দরকার নেই)
-# ==========================================
-class PathResolver:
-    """A simple helper to calculate relative paths for nested directories."""
-    def __init__(self, site_url=''):
-        self.site_url = site_url
-
-    def get_current_depth(self, path):
-        return max(0, len(path.replace('\\', '/').split('/')) - 1)
-
-    def _get_prefix(self, depth):
-        return "../" * depth if depth > 0 else "./"
-
-    def resolve_static(self, filename, current_depth):
-        return f"{self._get_prefix(current_depth)}static/{filename}"
-
-    def get_breadcrumb_link(self, target_path, current_depth):
-        return f"{self._get_prefix(current_depth)}{target_path}"
-# ==========================================
-
+from .path_resolver import PathResolver
 
 class SmartGenEngine:
     """
-    Builds the showcase site from Markdown content files.
+    Builds the documentation site from Markdown files.
     """
     
     def __init__(self, config_path='smartgen.yml', site_dir='site'):
-        """
-        Initialize the Engine.
-        """
         self.config_path = config_path
         self.site_dir = site_dir
         self.config = self.load_config()
-        
-        self.docs_dir = '.' 
+        self.docs_dir = '.'  # Updated to root directory
         self.theme_dir = os.path.join(os.path.dirname(__file__), 'themes', 'default')
         self.converter = MarkdownConverter()
         self.env = Environment(loader=FileSystemLoader(self.theme_dir))
         
-        # Initialize inline PathResolver
         site_url = self.config.get('site_url', '')
         self.path_resolver = PathResolver(site_url=site_url)
 
     def load_config(self):
-        """Load the smartgen.yml configuration."""
         if not os.path.exists(self.config_path):
             return {"site_name": "SmartGen Showcase", "nav": []}
         with open(self.config_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
 
     def process_content_files(self):
-        """Build the entire showcase site. (Called by cli.py)"""
+        """Build the entire documentation site."""
         if os.path.exists(self.site_dir):
             shutil.rmtree(self.site_dir)
         os.makedirs(self.site_dir)
@@ -115,7 +87,6 @@ class SmartGenEngine:
         process_nav(nav)
 
     def build_page(self, title, md_path):
-        """Build a single page from Markdown to HTML."""
         if md_path.startswith('http://') or md_path.startswith('https://'):
             return
         
