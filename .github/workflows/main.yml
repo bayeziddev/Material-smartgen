@@ -1,165 +1,93 @@
 # =============================================================================
-# SmartGen Showcase CI & Deploy Pipeline
+# SmartGen Showcase Engine Core logic with HTML, Markdown, YAML, and JSON support
 # Author: Sayad Md Bayezid Hosan
 # Repository: https://github.com/bayeziddev/smartGenShowcase
 # =============================================================================
 
-name: SmartGen Showcase CI & Deploy
+import os
+import json
+import yaml
+import markdown2
+from pathlib import Path
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+class SmartGenEngine:
+    def __init__(self, config_path="smartgen.yml"):
+        self.config_path = config_path
+        self.config = self.load_config()
+        self.site_dir = Path("site")
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    def load_config(self):
+        """Loads configuration from YAML or JSON format."""
+        if Path(self.config_path).exists():
+            with open(self.config_path, "r", encoding="utf-8") as f:
+                if self.config_path.endswith((".yaml", ".yml")):
+                    return yaml.safe_load(f)
+                elif self.config_path.endswith(".json"):
+                    return json.load(f)
+        return {
+            "site_name": "SmartGen Showcase",
+            "site_description": "Portfolio and Design Showcase by Sayad Md Bayezid Hosan"
+        }
 
-concurrency:
-  group: "pages-${{ github.ref }}"
-  cancel-in-progress: false
+    def process_content_files(self, source_dir="."):
+        """
+        Scans the project directory, removing the strict requirement for a 'docs/' folder.
+        Supports parsing of Markdown (.md), HTML (.html), YAML (.yaml/.yml), and JSON (.json) files.
+        """
+        source_path = Path(source_dir)
+        self.site_dir.mkdir(exist_ok=True)
 
-env:
-  PYTHON_VERSION: "3.12"
+        supported_extensions = {".md", ".html", ".yaml", ".yml", ".json"}
+        
+        for file_path in source_path.rglob("*"):
+            if file_path.is_file() and file_path.suffix in supported_extensions:
+                # Skip build outputs and hidden directories
+                if "site" in file_path.parts or ".git" in file_path.parts or "__pycache__" in file_path.parts:
+                    continue
 
-jobs:
-  validate:
-    name: Validate Project
-    runs-on: ubuntu-latest
+                relative_path = file_path.relative_to(source_path)
+                output_path = self.site_dir / relative_path.with_suffix(".html")
+                output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+                self.render_file(file_path, output_path)
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+    def render_file(self, file_path: Path, output_path: Path):
+        """Renders file contents based on its format type into valid HTML."""
+        ext = file_path.suffix.lower()
+        content_html = ""
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: pip-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            pip-${{ runner.os }}-
+        with open(file_path, "r", encoding="utf-8") as f:
+            raw_data = f.read()
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          pip install .
+        if ext == ".md":
+            content_html = markdown2.markdown(raw_data, extras=["fenced-code-blocks", "tables", "metadata"])
+        elif ext == ".html":
+            content_html = raw_data
+        elif ext in {".yaml", ".yml"}:
+            parsed_data = yaml.safe_load(raw_data)
+            content_html = f"<pre><code>{json.dumps(parsed_data, indent=2)}</code></pre>"
+        elif ext == ".json":
+            parsed_data = json.loads(raw_data)
+            content_html = f"<pre><code>{json.dumps(parsed_data, indent=2)}</code></pre>"
 
-      - name: Validate Configuration
-        run: |
-          echo "Checking SmartGen showcase configuration..."
-          if [ -f smartgen.yml ] || [ -f SmartGen.yml ]; then
-            echo "✔ Configuration file found"
-          else
-            echo "⚠ Configuration file not found."
-            exit 1
-          fi
+        # Wrap with basic layout wrapper
+        final_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{file_path.stem} - {self.config.get('site_name', 'SmartGen')}</title>
+    <link rel="stylesheet" href="assets/css/premium.css">
+</head>
+<body>
+    <main class="content markdown-body">
+        {content_html}
+    </main>
+</body>
+</html>"""
 
-      - name: Validate Showcase Folder
-        run: |
-          if [ ! -d docs ]; then
-            echo "docs folder not found"
-            exit 1
-          fi
-          echo "Showcase folder verified."
+        with open(output_path, "w", encoding="utf-8") as out:
+            out.write(final_html)
 
-      - name: Validate Markdown Files
-        run: |
-          COUNT=$(find docs -name "*.md" | wc -l)
-          echo "Markdown files found: $COUNT"
-          if [ "$COUNT" -eq "0" ]; then
-            echo "No showcase files found in docs/."
-            exit 1
-          fi
-
-  build:
-    name: Build SmartGen Showcase
-    runs-on: ubuntu-latest
-    needs: validate
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          pip install .
-
-      - name: Build Showcase Site
-        run: |
-          echo "Building SmartGen Showcase..."
-          smartgen-showcase build
-
-      - name: Verify Build & Prevent Jekyll Overrides
-        run: |
-          if [ ! -d site ]; then
-            echo "Build failed: 'site' directory not generated."
-            exit 1
-          fi
-          # Touch .nojekyll to ensure GitHub Pages serves assets properly
-          touch site/.nojekyll
-          echo "Build successful. Added .nojekyll flag."
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-  deploy:
-    name: Deploy GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  summary:
-    name: Build Summary
-    if: always()
-    needs:
-      - validate
-      - build
-      - deploy
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Workflow Summary
-        run: |
-          echo "# SmartGen Showcase Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Repository: $GITHUB_REPOSITORY" >> $GITHUB_STEP_SUMMARY
-          echo "Branch: $GITHUB_REF_NAME" >> $GITHUB_STEP_SUMMARY
-          echo "Commit: $GITHUB_SHA" >> $GITHUB_STEP_SUMMARY
-          echo "Triggered by: $GITHUB_ACTOR" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Status: Showcase pipeline execution finished." >> $GITHUB_STEP_SUMMARY
+if __name__ == "__main__":
+    engine = SmartGenEngine()
+    engine.process_content_files()
