@@ -2,7 +2,6 @@ import markdown2
 
 class MarkdownConverter:
     def __init__(self):
-        # Enable common extras for documentation
         self.extras = [
             "fenced-code-blocks",
             "tables",
@@ -14,5 +13,4 @@ class MarkdownConverter:
         ]
 
     def convert(self, text):
-        """Convert markdown text to HTML."""
         return markdown2.markdown(text, extras=self.extras)
