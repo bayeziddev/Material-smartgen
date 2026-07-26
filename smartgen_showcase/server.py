@@ -1,74 +1,60 @@
-"""
-Development Server for SmartGen Showcase.
-Handles live-reloading and serving the static site.
-"""
-
 import os
-import http.server
-import socketserver
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-
-# Updated import: using SmartGenEngine instead of Builder
+import shutil
+from pathlib import Path
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from .core import SmartGenEngine
 
-class ContentChangeHandler(FileSystemEventHandler):
-    def __init__(self, config_path):
-        self.config_path = config_path
-        # Initialize the updated engine
-        self.engine = SmartGenEngine(config_path=self.config_path)
+app = FastAPI(title="SmartGen Docs Upload Manager")
 
-    def on_any_event(self, event):
-        # Ignore changes in the generated site directory to prevent infinite loops
-        if 'site' in event.src_path or event.is_directory:
-            return
-            
-        print(f"\n[Live Reload] Change detected in: {event.src_path}")
-        print("Rebuilding showcase...")
-        try:
-            # Updated function call
-            self.engine.process_content_files()
-            print("✔ Rebuild successful! Refresh your browser.")
-        except Exception as e:
-            print(f"✖ Build failed: {e}")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class DevServer:
-    def __init__(self, config_path='smartgen.yml', port=8000):
-        self.config_path = config_path
-        self.port = port
-        self.site_dir = 'site'
+DOCS_DIR = Path(".")
+ALLOWED_EXTENSIONS = {".md", ".markdown"}
 
-    def run(self):
-        # 1. Perform initial build before starting server
-        print("Performing initial build...")
-        engine = SmartGenEngine(self.config_path)
+@app.get("/", response_class=HTMLResponse)
+async def upload_page():
+    return """
+    <!-- Upload interface HTML content remains the same -->
+    <h1>Upload Manager</h1>
+    """
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+    
+    if not any(file.filename.endswith(ext) for ext in ALLOWED_EXTENSIONS):
+        raise HTTPException(status_code=400, detail="Only .md and .markdown files are allowed")
+    
+    DOCS_DIR.mkdir(parents=True, exist_ok=True)
+    
+    file_path = DOCS_DIR / file.filename
+    try:
+        contents = await file.read()
+        with open(file_path, 'wb') as f:
+            f.write(contents)
+        return JSONResponse({"message": f"File {file.filename} uploaded successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
+
+@app.post("/rebuild")
+async def rebuild_site():
+    try:
+        engine = SmartGenEngine("smartgen.yml", "site")
         engine.process_content_files()
+        return JSONResponse({"message": "Site rebuilt successfully"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error rebuilding site: {str(e)}")
 
-        # 2. Start Watchdog observer for live changes
-        event_handler = ContentChangeHandler(self.config_path)
-        observer = Observer()
-        observer.schedule(event_handler, path='.', recursive=True)
-        observer.start()
-
-        # 3. Start Local HTTP Server
-        if not os.path.exists(self.site_dir):
-            os.makedirs(self.site_dir)
-            
-        os.chdir(self.site_dir)
-        handler = http.server.SimpleHTTPRequestHandler
-        
-        # Use TCPServer with allow_reuse_address to avoid "Port already in use" errors
-        socketserver.TCPServer.allow_reuse_address = True
-        
-        with socketserver.TCPServer(("", self.port), handler) as httpd:
-            print("============================================================")
-            print(f"✔ SmartGen Dev Server running at: http://localhost:{self.port}")
-            print("   Press Ctrl+C to stop.")
-            print("============================================================")
-            try:
-                httpd.serve_forever()
-            except KeyboardInterrupt:
-                print("\nShutting down server...")
-            finally:
-                observer.stop()
-                observer.join()
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
