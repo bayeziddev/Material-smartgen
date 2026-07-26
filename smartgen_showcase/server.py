@@ -1,60 +1,62 @@
+"""
+Development Server for SmartGen Showcase.
+Handles live-reloading and serving the static site.
+"""
+
 import os
-import shutil
-from pathlib import Path
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+import http.server
+import socketserver
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
 from .core import SmartGenEngine
 
-app = FastAPI(title="SmartGen Docs Upload Manager")
+class ContentChangeHandler(FileSystemEventHandler):
+    def __init__(self, config_path):
+        self.config_path = config_path
+        self.engine = SmartGenEngine(config_path=self.config_path)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    def on_any_event(self, event):
+        if 'site' in event.src_path or event.is_directory:
+            return
+        print(f"\n[Live Reload] Change detected in: {event.src_path}")
+        try:
+            self.engine.process_content_files()
+            print("✔ Rebuild successful! Refresh your browser.")
+        except Exception as e:
+            print(f"✖ Build failed: {e}")
 
-DOCS_DIR = Path(".")
-ALLOWED_EXTENSIONS = {".md", ".markdown"}
+class DevServer:
+    def __init__(self, config_path='smartgen.yml', port=8000):
+        self.config_path = config_path
+        self.port = port
+        self.site_dir = 'site'
 
-@app.get("/", response_class=HTMLResponse)
-async def upload_page():
-    return """
-    <!-- Upload interface HTML content remains the same -->
-    <h1>Upload Manager</h1>
-    """
-
-@app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No file provided")
-    
-    if not any(file.filename.endswith(ext) for ext in ALLOWED_EXTENSIONS):
-        raise HTTPException(status_code=400, detail="Only .md and .markdown files are allowed")
-    
-    DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    
-    file_path = DOCS_DIR / file.filename
-    try:
-        contents = await file.read()
-        with open(file_path, 'wb') as f:
-            f.write(contents)
-        return JSONResponse({"message": f"File {file.filename} uploaded successfully"})
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
-
-@app.post("/rebuild")
-async def rebuild_site():
-    try:
-        engine = SmartGenEngine("smartgen.yml", "site")
+    def run(self):
+        print("Performing initial build...")
+        engine = SmartGenEngine(self.config_path)
         engine.process_content_files()
-        return JSONResponse({"message": "Site rebuilt successfully"})
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error rebuilding site: {str(e)}")
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+        event_handler = ContentChangeHandler(self.config_path)
+        observer = Observer()
+        observer.schedule(event_handler, path='.', recursive=True)
+        observer.start()
+
+        if not os.path.exists(self.site_dir):
+            os.makedirs(self.site_dir)
+            
+        os.chdir(self.site_dir)
+        handler = http.server.SimpleHTTPRequestHandler
+        socketserver.TCPServer.allow_reuse_address = True
+        
+        with socketserver.TCPServer(("", self.port), handler) as httpd:
+            print("============================================================")
+            print(f"✔ Dev Server running at: http://localhost:{self.port}")
+            print("============================================================")
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\nShutting down server...")
+            finally:
+                observer.stop()
+                observer.join()
