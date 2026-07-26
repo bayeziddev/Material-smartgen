@@ -1,0 +1,30 @@
+/* ========== DYNAMIC DARK MODE OVERRIDES ========== */
+body.dark-mode {
+    --primary-color: #1a252f;
+    --accent-color: #2980b9;
+    --text-color: #ecf0f1;
+    --bg-color: #121824;
+    --sidebar-sidebar-bg: #1e293b;
+    --border-color: #334155;
+}
+
+body.dark-mode .content,
+body.dark-mode .sidebar,
+body.dark-mode .footer {
+    background-color: var(--sidebar-sidebar-bg);
+    color: var(--text-color);
+}
+
+body.dark-mode .markdown-body pre {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+body.dark-mode .markdown-body tr:nth-child(even) {
+    background: #1e293b;
+}
+
+body.dark-mode .side-nav a:hover {
+    background: #334155;
+    color: var(--accent-color);
+}
