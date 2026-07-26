@@ -2,7 +2,7 @@
 Core: Main static site engine for SmartGen Showcase.
 
 This module handles the conversion of Markdown files to HTML pages,
-using the PathResolver to ensure all links are correct across nested directories.
+ensuring all links are correct across nested directories without needing external modules.
 """
 
 import os
@@ -10,7 +10,28 @@ import yaml
 import shutil
 from jinja2 import Environment, FileSystemLoader
 from .converter import MarkdownConverter
-from .path_resolver import PathResolver
+
+# ==========================================
+# যুক্ত করা হয়েছে: PathResolver ক্লাস
+# (এর ফলে আলাদা path_resolver.py ফাইলের আর দরকার নেই)
+# ==========================================
+class PathResolver:
+    """A simple helper to calculate relative paths for nested directories."""
+    def __init__(self, site_url=''):
+        self.site_url = site_url
+
+    def get_current_depth(self, path):
+        return max(0, len(path.replace('\\', '/').split('/')) - 1)
+
+    def _get_prefix(self, depth):
+        return "../" * depth if depth > 0 else "./"
+
+    def resolve_static(self, filename, current_depth):
+        return f"{self._get_prefix(current_depth)}static/{filename}"
+
+    def get_breadcrumb_link(self, target_path, current_depth):
+        return f"{self._get_prefix(current_depth)}{target_path}"
+# ==========================================
 
 
 class SmartGenEngine:
@@ -21,24 +42,17 @@ class SmartGenEngine:
     def __init__(self, config_path='smartgen.yml', site_dir='site'):
         """
         Initialize the Engine.
-        
-        Args:
-            config_path: Path to the smartgen.yml configuration file
-            site_dir: Directory where the built site will be output
         """
         self.config_path = config_path
         self.site_dir = site_dir
         self.config = self.load_config()
         
-        # Changed to '.' (root) because your showcase folders (showcase/, materials/, etc.) 
-        # and index.md are generated directly in the repository root.
         self.docs_dir = '.' 
-        
         self.theme_dir = os.path.join(os.path.dirname(__file__), 'themes', 'default')
         self.converter = MarkdownConverter()
         self.env = Environment(loader=FileSystemLoader(self.theme_dir))
         
-        # Initialize PathResolver
+        # Initialize inline PathResolver
         site_url = self.config.get('site_url', '')
         self.path_resolver = PathResolver(site_url=site_url)
 
@@ -51,16 +65,13 @@ class SmartGenEngine:
 
     def process_content_files(self):
         """Build the entire showcase site. (Called by cli.py)"""
-        # Clear and create site directory
         if os.path.exists(self.site_dir):
             shutil.rmtree(self.site_dir)
         os.makedirs(self.site_dir)
 
-        # Tell GitHub Pages not to run its own Jekyll build over this output.
         with open(os.path.join(self.site_dir, '.nojekyll'), 'w') as f:
             pass
 
-        # Persist the custom domain across every deploy.
         site_url = self.config.get('site_url', '')
         if site_url:
             domain = site_url.replace('https://', '').replace('http://', '').split('/')[0]
@@ -68,16 +79,12 @@ class SmartGenEngine:
                 with open(os.path.join(self.site_dir, 'CNAME'), 'w') as f:
                     f.write(domain)
 
-        # Copy static assets
         static_src = os.path.join(self.theme_dir, 'static')
         static_dst = os.path.join(self.site_dir, 'static')
         if os.path.exists(static_src):
             shutil.copytree(static_src, static_dst)
 
-        # Build pages with support for nested navigation
         nav = self.config.get('nav', [])
-
-        # Flatten nav into an ordered sequence of real (title, md_path) pages
         self.page_sequence = []
 
         def flatten_nav(nav_list):
@@ -95,14 +102,12 @@ class SmartGenEngine:
         flatten_nav(nav)
 
         def process_nav(nav_list):
-            """Recursively process navigation items."""
             for item in nav_list:
                 if isinstance(item, dict):
                     for title, path in item.items():
                         if isinstance(path, str):
                             self.build_page(title, path)
                         elif isinstance(path, list):
-                            # Recursive call for nested categories
                             process_nav(path)
                 elif isinstance(item, str):
                     self.build_page(item, item)
@@ -110,14 +115,7 @@ class SmartGenEngine:
         process_nav(nav)
 
     def build_page(self, title, md_path):
-        """
-        Build a single page from Markdown to HTML.
-        
-        Args:
-            title: Title of the page
-            md_path: Path to the Markdown file
-        """
-        # Skip external URLs
+        """Build a single page from Markdown to HTML."""
         if md_path.startswith('http://') or md_path.startswith('https://'):
             return
         
@@ -131,21 +129,17 @@ class SmartGenEngine:
 
         html_body = self.converter.convert(md_content)
         
-        # Use premium template if it exists
         template_name = 'page_premium.html' if os.path.exists(os.path.join(self.theme_dir, 'page_premium.html')) else 'page.html'
         template = self.env.get_template(template_name)
         
-        # Calculate page depth for relative path resolution
         relative_path = md_path.replace('.md', '.html')
         current_depth = self.path_resolver.get_current_depth(relative_path)
         
-        # Generate breadcrumbs with proper paths
         breadcrumbs = [
             {"title": "Home", "link": self.path_resolver.get_breadcrumb_link("index.html", current_depth)},
             {"title": title, "link": relative_path}
         ]
 
-        # Real, server-rendered previous/next links
         prev_page, next_page = None, None
         sequence = getattr(self, 'page_sequence', [])
         for i, (seq_title, seq_path) in enumerate(sequence):
@@ -173,7 +167,6 @@ class SmartGenEngine:
             url_for=lambda type, filename: self._url_for(type, filename, current_depth)
         )
 
-        # Handle nested paths
         dst_path = os.path.join(self.site_dir, relative_path)
         os.makedirs(os.path.dirname(dst_path), exist_ok=True)
 
@@ -181,17 +174,6 @@ class SmartGenEngine:
             f.write(output_content)
 
     def _url_for(self, type, filename, current_depth=0):
-        """
-        Helper for template to resolve URLs.
-        
-        Args:
-            type: Type of URL ('static', 'page', etc.)
-            filename: Name of the file
-            current_depth: Depth of the current page
-        
-        Returns:
-            Resolved URL
-        """
         if type == 'static':
             return self.path_resolver.resolve_static(filename, current_depth)
         elif type == 'page':
