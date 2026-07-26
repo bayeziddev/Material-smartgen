@@ -1,6 +1,6 @@
 import click
 import os
-from .core import SmartGenEngine # Updated to match engine class name
+from .core import SmartGenEngine
 from .server import DevServer
 from .autodoc import AutodocGenerator
 from .scaffold import Scaffolder
@@ -88,7 +88,7 @@ def init():
     # Create the premium showcase boilerplate config
     config_content = """# SmartGen Showcase Configuration
 site_name: SmartGen Design Showcase
-site_url: https://github.com/bayeziddev/smartGenShowcase
+site_url: https://github.com/bayeziddev/Material-smartgen
 site_author: Sayad Md Bayezid Hosan
 
 theme:
