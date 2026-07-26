@@ -1,4 +1,4 @@
-#Copyright (c) 2026 Sayad Md Bayezid Hosan (Smartgen Platform)
+# Copyright (c) 2026 Sayad Md Bayezid Hosan (Smartgen Platform)
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
 # deal in the Software without restriction, including without limitation the
@@ -21,13 +21,7 @@ copyright: Copyright &copy; 2026 Sayad Md Bayezid Hosan | Connect with Bayezid
 
 # Configuration
 theme:
-  name: material # Standardized for grid/card support (change to 'premium' if custom)
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - navigation.expand
-    - content.action.view
-    - content.code.copy
+  name: premium
   palette:
     primary: "#4A3AE3"
     accent: "#C2660D"
@@ -37,12 +31,11 @@ theme:
   favicon: assets/favicon.png
   logo: assets/logo.png
 
-# Plugins (Crucial for a visual showcase)
+# Plugins
 plugins:
   - search
-  - glightbox # Highly recommended: allows clicking images to open a full-screen gallery
 
-# Markdown Extensions (Enables grids, cards, and custom HTML for design assets)
+# Markdown Extensions
 markdown_extensions:
   - attr_list
   - md_in_html
