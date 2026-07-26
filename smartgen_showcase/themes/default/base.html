@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - {{ config.site_name }}</title>
+    <!-- ডাইনামিক CSS লিংক (যে কোনো ফোল্ডার থেকে কাজ করবে) -->
+    <link rel="stylesheet" href="{{ url_for('static', 'css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="brand">
+                <!-- ডাইনামিক হোম লিংক -->
+                <a href="{{ url_for('page', 'index.html') }}">{{ config.site_name }}</a>
+            </div>
+            <nav class="top-nav">
+                <a href="{{ config.site_url }}">Smartgen Platform</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container main-content">
+        <aside class="sidebar">
+            <nav class="side-nav">
+                <ul>
+                    {% for item in nav %}
+                        {% for label, link in item.items() %}
+                            <!-- ডাইনামিক সাইডবার লিংক -->
+                            <li><a href="{{ url_for('page', link.replace('.md', '.html')) }}">{{ label }}</a></li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{ config.site_author }}. Built with <strong>SmartGen Showcase</strong>.</p>
+            <p>Visit <a href="https://www.smartgentools.com">Smartgen Platform</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>
