@@ -119,17 +119,17 @@ full = [
 [project.urls]
 Homepage = "https://showcase.smartgentools.com"
 Documentation = "https://showcase.smartgentools.com"
-Repository = "https://github.com/bayeziddev/smartGenShowcase"
-Issues = "https://github.com/bayeziddev/smartGenShowcase/issues"
-Discussions = "https://github.com/bayeziddev/smartGenShowcase/discussions"
-Releases = "https://github.com/bayeziddev/smartGenShowcase/releases"
+Repository = "https://github.com/bayeziddev/Material-smartgen"
+Issues = "https://github.com/bayeziddev/Material-smartgen/issues"
+Discussions = "https://github.com/bayeziddev/Material-smartgen/discussions"
+Releases = "https://github.com/bayeziddev/Material-smartgen/releases"
 Developer = "https://g.dev/SayadBayezid"
 GitHub = "https://github.com/sayadbayezid"
 LinkedIn = "https://www.linkedin.com/in/sayadbayezid"
 Website = "https://www.smartgentools.com"
 
 [project.scripts]
-smartgen-showcase = "smartgen-showcase.cli:main"
+smartgen-showcase = "smartgen_showcase.cli:main"
 
 [project.entry-points."smartgen.builders"]
 
@@ -144,11 +144,11 @@ smartgen-showcase = "smartgen-showcase.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = [
-    "smartgen-showcase*"
+    "smartgen_showcase*"
 ]
 
 [tool.setuptools.package-data]
-smartgen-showcase = [
+smartgen_showcase = [
     "themes/**/*",
     "templates/**/*",
     "assets/**/*",
