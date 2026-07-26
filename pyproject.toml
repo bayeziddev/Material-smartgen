@@ -129,7 +129,7 @@ LinkedIn = "https://www.linkedin.com/in/sayadbayezid"
 Website = "https://www.smartgentools.com"
 
 [project.scripts]
-smartgen-showcase = "smartgen_showcase.cli:main"
+smartgen-showcase = "smartgen-showcase.cli:main"
 
 [project.entry-points."smartgen.builders"]
 
@@ -144,11 +144,11 @@ smartgen-showcase = "smartgen_showcase.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = [
-    "smartgen_showcase*"
+    "smartgen-showcase*"
 ]
 
 [tool.setuptools.package-data]
-smartgen_showcase = [
+smartgen-showcase = [
     "themes/**/*",
     "templates/**/*",
     "assets/**/*",
