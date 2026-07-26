@@ -71,7 +71,7 @@ def autodoc(module_name, output):
 
 @main.command()
 @click.option('--json-path', default='data/changelog.json', help='Path to changelog JSON.')
-@click.option('--output', default='docs/changelog.md', help='Output Markdown file.')
+@click.option('--output', default='changelog.md', help='Output Markdown file.')
 def render_changelog(json_path, output):
     """Render changelog.json into a Markdown file for the docs."""
     click.secho("Rendering changelog from JSON...", fg="cyan")
@@ -87,14 +87,14 @@ def init():
     
     config_content = """# SmartGen Showcase Configuration
 site_name: My SmartGen Showcase
-site_url: https://github.com/bayeziddev/smartGenShowcase
+site_url: https://bayeziddev.github.io/Material-smartgen/
 site_author: Sayad Md Bayezid Hosan
 
 theme:
   name: premium
   palette:
-    primary: "#0052cc"
-    accent: "#ff9900"
+    primary: "#4A3AE3"
+    accent: "#C2660D"
 
 nav:
   - Home: index.md
