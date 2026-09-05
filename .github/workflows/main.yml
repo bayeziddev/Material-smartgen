@@ -115,6 +115,19 @@ jobs:
           touch site/.nojekyll
           echo "Build successful. Added .nojekyll flag."
 
+      - name: Verify Rendered Assets
+        run: |
+          test -s site/static/css/premium.css
+          grep -q '<link rel="stylesheet" href="static/css/premium.css">' site/index.html
+          grep -q '.header' site/static/css/premium.css
+          grep -q '.main-content' site/static/css/premium.css
+          grep -q '@media' site/static/css/premium.css
+          if grep -R 'css/style.css' site --include='*.html'; then
+            echo "Broken stylesheet reference detected: css/style.css"
+            exit 1
+          fi
+          echo "Rendered CSS assets and stylesheet references verified."
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
