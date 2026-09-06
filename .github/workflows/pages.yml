@@ -29,7 +29,15 @@ jobs:
       - name: Build static site
         run: python -m smartgen_showcase.cli build --config smartgen.yml --site-dir site
       - name: Publish Portfolio One plugin preview
-        run: cp -R protfolio-one site/protfolio-one
+        run: |
+          mkdir -p site/protfolio-one
+          cp -R protfolio-one/. site/protfolio-one/
+          cp protfolio-one/index.html site/portfolio-one.html
+          test -f site/protfolio-one/index.html
+          test -f site/protfolio-one/styles.css
+          test -f site/protfolio-one/runtime/effects.js
+          echo "Portfolio One preview files:"
+          find site/protfolio-one -maxdepth 3 -type f | sort
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
