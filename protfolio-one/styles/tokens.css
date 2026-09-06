@@ -1,0 +1,24 @@
+:root {
+  --po-canvas: #f3f1eb;
+  --po-ink: #10100e;
+  --po-muted: #6c6b64;
+  --po-line: #d8d5cc;
+  --po-signal: #c9f05a;
+  --po-cobalt: #5263ff;
+  --po-orange: #ff784d;
+  --po-radius-card: 0px;
+  --po-radius-pill: 999px;
+  --po-content-width: 1180px;
+  --po-transition: cubic-bezier(.23,1,.32,1);
+}
+
+[data-portfolio-one] {
+  --paper: var(--po-canvas);
+  --ink: var(--po-ink);
+  --muted: var(--po-muted);
+  --line: var(--po-line);
+  --lime: var(--po-signal);
+  --blue: var(--po-cobalt);
+  --orange: var(--po-orange);
+  --ease: var(--po-transition);
+}

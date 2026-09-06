@@ -9,11 +9,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/extensions.css">
 </head>
-<body>
+<body data-portfolio-one data-portfolio-config='{"motion":{"parallax":true}}'>
   <div class="noise" aria-hidden="true"></div>
   <header class="site-header">
-    <a class="brand" href="#top" aria-label="Portfolio One home"><span class="brand-dot"></span><span>Sayad / Studio</span></a>
+    <a class="brand" href="#top" aria-label="Portfolio One home"><span class="brand-dot"></span><span data-content="brand">Sayad / Studio</span></a>
     <nav class="nav" aria-label="Primary navigation">
       <a href="#work">Selected work</a><a href="#services">Capabilities</a><a href="#about">About</a><a class="nav-cta" href="#contact">Start a project <span>↗</span></a>
     </nav>
@@ -21,18 +23,19 @@
   </header>
 
   <main id="top">
-    <section class="hero section-shell">
+    <section class="hero section-shell" data-slot="hero.before"><div class="po-slot" data-slot-target="hero.before"></div>
       <div class="hero-kicker"><span class="eyebrow">Portfolio One / 2026</span><span class="status"><i></i> Available for select builds</span></div>
       <div class="hero-grid">
         <div class="hero-copy">
           <p class="eyebrow accent">Independent digital systems studio</p>
-          <h1>Build less noise.<br><em>Ship more signal.</em></h1>
-          <p class="hero-lede">I design and build useful web platforms, product identities, and growth systems for people who want the work to keep working after launch.</p>
+          <h1><span data-content="hero.title">Build less noise.</span><br><em data-content="hero.titleAccent">Ship more signal.</em></h1>
+          <p class="hero-lede" data-content="hero.description">I design and build useful web platforms, product identities, and growth systems for people who want the work to keep working after launch.</p>
           <div class="hero-actions"><a class="button button-primary" href="#work">See the work <span>↗</span></a><a class="text-link" href="#about">How I work <span>↓</span></a></div>
         </div>
         <div class="hero-art" aria-label="Abstract animated gradient sculpture"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="art-grid"></div><span class="art-label">DESIGN / BUILD / SUPPORT</span></div>
       </div>
       <div class="hero-meta"><span>Based in Bangladesh / Working worldwide</span><span>Scroll to explore <b>↓</b></span></div>
+      <div class="po-slot" data-slot-target="hero.after"></div>
     </section>
 
     <section class="marquee" aria-label="Services"><div class="marquee-track"><span>Strategy</span><b>✳</b><span>Interface design</span><b>✳</b><span>Web platforms</span><b>✳</b><span>SEO systems</span><b>✳</b><span>Strategy</span><b>✳</b><span>Interface design</span><b>✳</b><span>Web platforms</span><b>✳</b><span>SEO systems</span><b>✳</b></div></section>
@@ -42,19 +45,21 @@
       <div class="intro-grid"><h2>Digital work should feel like an advantage, not another thing to manage.</h2><div><p class="large-copy">Most digital work fails quietly: a site nobody maintains, an audit that goes stale, a dashboard only the agency knows how to open. I build the opposite — clear systems with a human hand in the details.</p><p>That means fewer, deeper things: a tools platform with real utility, a lead collector that keeps only verified data, a storefront that works on ordinary mobile data, and open-source material anyone can reskin.</p><div class="facts"><div><strong>2019</strong><span>building on the web since</span></div><div><strong>Solo</strong><span>strategy, build, support</span></div><div><strong>22</strong><span>verified profiles</span></div></div></div></div>
     </section>
 
-    <section class="section-shell work-section" id="work"><div class="section-heading"><div><div class="section-index">02 <span>/</span> Selected work</div><h2>Things made to move.</h2></div><a class="text-link" href="#contact">Have a project? <span>↗</span></a></div><div class="work-grid">
+    <section class="section-shell work-section" id="work"><div class="po-slot" data-slot-target="work.before"></div><div class="section-heading"><div><div class="section-index">02 <span>/</span> Selected work</div><h2>Things made to move.</h2></div><a class="text-link" href="#contact">Have a project? <span>↗</span></a></div><div class="work-grid">
       <a class="work-card work-card-featured" href="#contact"><div class="card-visual visual-blue"><span class="visual-window"><i></i><i></i><i></i><b>SMART<br>GEN</b><small>120+ useful tools / one calm interface</small></span></div><div class="card-meta"><span>01 / Platform</span><h3>SmartGen Tools</h3><p>A tools platform with a clear path from curiosity to completion.</p></div></a>
       <a class="work-card" href="#contact"><div class="card-visual visual-orange"><span class="visual-type">RINOVA<br><em>BD</em></span><span class="visual-pill">Brand / Commerce</span></div><div class="card-meta"><span>02 / Commerce</span><h3>Rinova BD</h3><p>A confident storefront system for a business ready to scale.</p></div></a>
       <a class="work-card" href="#contact"><div class="card-visual visual-lime"><span class="visual-signal">↗<br><em>build<br>what lasts</em></span><span class="visual-pill">Portfolio / Open source</span></div><div class="card-meta"><span>03 / Theme</span><h3>Portfolio One</h3><p>A ready-to-ship portfolio theme for people who do the work.</p></div></a>
-    </div></section>
+    <div class="po-slot" data-slot-target="work.after"></div></div></section>
 
     <section class="section-shell capabilities" id="services"><div class="section-index">03 <span>/</span> Capabilities</div><div class="capabilities-grid"><h2>Bring the messy part.<br><em>I’ll bring the system.</em></h2><div class="capability-list"><div><span>01</span><h3>Web platforms</h3><p>Dashboards, SaaS tools, and client sites that stay fast under real traffic.</p></div><div><span>02</span><h3>Product identity</h3><p>Names, visual systems, and interfaces that make the next decision obvious.</p></div><div><span>03</span><h3>Growth systems</h3><p>Technical SEO, content structure, and analytics built as a repeatable practice.</p></div></div></div></section>
 
     <section class="section-shell process"><div class="section-index">04 <span>/</span> The way through</div><div class="process-grid"><h2>A small studio<br>with a <em>big surface area.</em></h2><div class="steps"><div><span>01</span><h3>Find the signal</h3><p>We name the real problem, the audience, and the one outcome that changes the room.</p></div><div><span>02</span><h3>Make it tangible</h3><p>Fast prototypes, sharp writing, and a visual direction you can react to before it gets expensive.</p></div><div><span>03</span><h3>Ship the system</h3><p>Production-ready code, handover notes, and the control to keep improving without me.</p></div></div></div></section>
 
-    <section class="contact-section" id="contact"><div class="section-shell contact-inner"><div><div class="section-index">05 <span>/</span> Start a conversation</div><h2>Have a good problem?<br><em>Let’s make it useful.</em></h2></div><div class="contact-side"><p>Tell me what you’re trying to fix, build, or make clearer. A few sentences is plenty.</p><a class="button button-light" href="mailto:support@sayadbayezid.com">support@sayadbayezid.com <span>↗</span></a><p class="contact-note">Usually replies within 2 working days.</p></div></div></section>
-  </main>
+    <section class="contact-section" id="contact"><div class="po-slot" data-slot-target="contact.before"></div><div class="section-shell contact-inner"><div><div class="section-index">05 <span>/</span> Start a conversation</div><h2>Have a good problem?<br><em>Let’s make it useful.</em></h2></div><div class="contact-side"><p>Tell me what you’re trying to fix, build, or make clearer. A few sentences is plenty.</p><a class="button button-light" href="mailto:support@sayadbayezid.com">support@sayadbayezid.com <span>↗</span></a><p class="contact-note">Usually replies within 2 working days.</p></div></div><div class="po-slot" data-slot-target="contact.after"></div></section>\n  </main>
   <footer class="site-footer section-shell"><div class="footer-brand"><span class="brand-dot"></span><span>Sayad / Studio</span></div><span>Portfolio One — Smartgen theme</span><a href="#top">Back to top ↑</a></footer>
+  <script src="runtime/config.js"></script>
+  <script src="runtime/effects.js"></script>
+  <script src="runtime/motion.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

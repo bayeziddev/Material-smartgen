@@ -1,0 +1,25 @@
+/*
+ * Portfolio One extension layer.
+ * Keep project overrides here so upgrades to styles.css remain safe.
+ * This file loads last and is intentionally small.
+ */
+
+[data-portfolio-one] .po-slot:empty {
+  display: none;
+}
+
+[data-portfolio-one] .po-custom-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border: 1px solid currentColor;
+  border-radius: var(--po-radius-pill);
+  padding: .45rem .7rem;
+  font: 10px 'DM Mono', monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Example project-level override:
+   [data-portfolio-one="agency"] { --po-signal:#f4b9ff; --po-cobalt:#5a2cff; }
+*/

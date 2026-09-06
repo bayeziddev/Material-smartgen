@@ -1,0 +1,22 @@
+# Project-level Portfolio One overrides.
+# Copy this file into your project and point theme.config at it.
+brand: "Your Studio"
+palette:
+  canvas: "#F5F1E8"
+  ink: "#171513"
+  signal: "#D6F36A"
+  cobalt: "#5E68FF"
+  orange: "#FF7955"
+motion:
+  reveal: true
+  hero: true
+  parallax: false
+effects:
+  noise: true
+  orbital: true
+  marquee: true
+content:
+  brand: "Your Studio"
+  hero.title: "Build less noise."
+  hero.titleAccent: "Ship more signal."
+  hero.description: "A short statement about the work your studio ships and supports."

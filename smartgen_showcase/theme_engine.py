@@ -13,28 +13,37 @@ class ThemeEngine:
         self.custom_theme_dir = custom_theme_dir or 'theme'
         self.current_theme = None
         self.theme_config = {}
+        self.theme_manifest = {}
+        self.theme_path = None
     
     def load_theme(self, theme_name: str) -> bool:
         custom_path = os.path.join(self.custom_theme_dir, theme_name)
         if os.path.exists(custom_path):
             self.current_theme = custom_path
+            self.theme_path = custom_path
             self._load_theme_config(custom_path)
             return True
         
         builtin_path = os.path.join(self.themes_dir, 'default', theme_name)
         if os.path.exists(builtin_path):
             self.current_theme = builtin_path
+            self.theme_path = builtin_path
             self._load_theme_config(builtin_path)
             return True
         
         return False
     
     def _load_theme_config(self, theme_path: str) -> None:
+        import yaml
         config_file = os.path.join(theme_path, 'config.yml')
+        manifest_file = os.path.join(theme_path, 'theme.yml')
         if os.path.exists(config_file):
-            import yaml
             with open(config_file, 'r') as f:
                 self.theme_config = yaml.safe_load(f) or {}
+        if os.path.exists(manifest_file):
+            with open(manifest_file, 'r') as f:
+                self.theme_manifest = yaml.safe_load(f) or {}
+            self.theme_config = {**self.theme_config, **self.theme_manifest}
     
     def get_template_path(self, template_name: str) -> Optional[str]:
         if not self.current_theme:
@@ -64,6 +73,21 @@ class ThemeEngine:
     
     def get_theme_config(self, key: str, default=None):
         return self.theme_config.get(key, default)
+
+    def get_manifest(self) -> Dict:
+        return dict(self.theme_manifest)
+
+    def get_declared_assets(self, asset_type: Optional[str] = None) -> list:
+        assets = self.theme_manifest.get('assets', {}) if self.theme_manifest else {}
+        if asset_type:
+            return list(assets.get(asset_type, []))
+        return [path for paths in assets.values() if isinstance(paths, list) for path in paths]
+
+    def get_hook(self, hook_name: str, default=None):
+        return (self.theme_manifest.get('hooks', {}) if self.theme_manifest else {}).get(hook_name, default)
+
+    def get_slots(self) -> list:
+        return list(self.theme_manifest.get('slots', []) if self.theme_manifest else [])
     
     def create_custom_theme_template(self, theme_name: str) -> None:
         theme_path = os.path.join(self.custom_theme_dir, theme_name)

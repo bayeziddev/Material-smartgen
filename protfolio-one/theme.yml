@@ -1,0 +1,28 @@
+id: protfolio-one
+name: Portfolio One
+version: 1.1.0
+kind: smartgen-theme
+entry: index.html
+assets:
+  styles:
+    - styles.css
+    - styles/tokens.css
+    - styles/extensions.css
+  scripts:
+    - runtime/config.js
+    - runtime/effects.js
+    - runtime/motion.js
+    - script.js
+config: runtime/theme.config.yml
+hooks:
+  css: "[data-portfolio-one]"
+  effects: "window.PortfolioOne.effects"
+  motion: "window.PortfolioOne.motion"
+  content: "window.PortfolioOne.content"
+slots:
+  - hero.before
+  - hero.after
+  - work.before
+  - work.after
+  - contact.before
+  - contact.after

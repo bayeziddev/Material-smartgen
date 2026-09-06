@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio One Consumer Example</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/extensions.css">
+  <style>
+    [data-portfolio-one="consumer"] { --po-signal:#f0b8ff; --po-cobalt:#4528e6; }
+    [data-portfolio-one="consumer"] .consumer-note { width:min(1180px,calc(100% - 64px)); margin:0 auto 32px; padding:18px; border:1px dashed currentColor; }
+  </style>
+</head>
+<body data-portfolio-one="consumer" data-portfolio-config='{"motion":{"parallax":false},"effects":{"noise":false,"marquee":false},"content":{"brand":"Northstar Studio","hero.title":"Make the complex","hero.titleAccent":"feel obvious.","hero.description":"Northstar builds calm digital systems for growing teams."}}'>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="site-header"><a class="brand" href="#top"><span class="brand-dot"></span><span data-content="brand">Northstar Studio</span></a><nav class="nav"><a href="#work">Work</a><a href="#contact">Contact</a></nav><button class="menu-toggle" type="button" aria-label="Toggle navigation"><span></span><span></span></button></header>
+  <main id="top">
+    <section class="hero section-shell"><div class="hero-kicker"><span class="eyebrow">Consumer example / plugin install</span></div><div class="hero-grid"><div class="hero-copy"><p class="eyebrow accent">Independent digital systems studio</p><h1><span data-content="hero.title">Make the complex</span><br><em data-content="hero.titleAccent">feel obvious.</em></h1><p class="hero-lede" data-content="hero.description">Northstar builds calm digital systems for growing teams.</p><div class="hero-actions"><a class="button button-primary" href="#work">See the work <span>↗</span></a></div></div><div class="hero-art"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="art-grid"></div></div></div><div class="po-slot" data-slot-target="hero.after"><div class="consumer-note" data-reveal>Custom slot content injected by the consuming project. Core theme files remain unchanged.</div></div></section>
+    <section class="section-shell work-section" id="work"><div class="section-heading"><div><div class="section-index">01 <span>/</span> Consumer project</div><h2>Built on the plugin.</h2></div></div></section>
+    <section class="contact-section" id="contact"><div class="section-shell contact-inner"><div><div class="section-index">02 <span>/</span> Contact</div><h2>Make it useful.</h2></div><div class="contact-side"><p>Configured through data attributes, CSS tokens, and runtime APIs.</p></div></div></section>
+  </main>
+  <script src="../runtime/config.js"></script><script src="../runtime/effects.js"></script><script src="../runtime/motion.js"></script><script src="../script.js"></script>
+</body>
+</html>

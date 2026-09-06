@@ -13,20 +13,11 @@ document.querySelectorAll('.nav a').forEach((link) => {
   });
 });
 
-const revealItems = document.querySelectorAll('.work-card, .capability-list > div, .steps > div, .facts > div');
-if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  revealItems.forEach((item, index) => {
-    item.style.opacity = '0';
-    item.style.transform = 'translateY(14px)';
-    item.style.transition = `opacity 520ms cubic-bezier(.23,1,.32,1) ${index * 45}ms, transform 520ms cubic-bezier(.23,1,.32,1) ${index * 45}ms`;
-  });
-  const observer = new IntersectionObserver((entries, instance) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
-      instance.unobserve(entry.target);
-    });
-  }, { threshold: 0.14 });
-  revealItems.forEach((item) => observer.observe(item));
-}
+// Mark the theme's default reveal targets. Consumer projects can add the same
+// attribute to injected markup and call the public runtime again.
+document.querySelectorAll('.hero-kicker, .hero-copy, .hero-art, .hero-meta, .section-heading, .work-card, .capability-list > div, .steps > div, .facts > div, .contact-inner').forEach((node) => node.setAttribute('data-reveal', ''));
+
+// The theme runtime owns motion/effects. Projects can call these APIs again
+// after injecting custom sections or changing their config.
+window.PortfolioOne?.motion?.reveal();
+window.PortfolioOne?.effects?.init();
