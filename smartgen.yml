@@ -21,7 +21,10 @@ copyright: Copyright &copy; 2026 Sayad Md Bayezid Hosan | Connect with Bayezid
 
 # Configuration
 theme:
-  name: premium
+  name: protfolio-one
+  manifest: protfolio-one/theme.yml
+  config: protfolio-one/runtime/theme.config.yml
+  preview: protfolio-one/index.html
   palette:
     primary: "#4A3AE3"
     accent: "#C2660D"
@@ -67,6 +70,7 @@ extra:
 # Navigation structure tailored for Design & Showcase
 nav:
   - Home: index.md
+  - Portfolio One Live Preview: protfolio-one.md
   - Community Sponsor: community/sponsor.md
 
   - Our Showcase:
