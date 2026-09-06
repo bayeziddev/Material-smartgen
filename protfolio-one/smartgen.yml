@@ -1,0 +1,20 @@
+theme:
+  id: protfolio-one
+  name: Portfolio One
+  version: 1.0.0
+  type: portfolio
+  description: Founder-led digital systems portfolio with premium motion, editorial hierarchy, and showcase-ready project cards.
+  author: Sayad Md Bayezid Hosan
+  palette:
+    canvas: "#F3F1EB"
+    ink: "#10100E"
+    signal: "#C9F05A"
+    cobalt: "#5263FF"
+    orange: "#FF784D"
+  features:
+    - responsive-layout
+    - animated-hero
+    - reduced-motion-support
+    - mobile-navigation
+    - project-showcase
+    - smartgen-yaml-compatible

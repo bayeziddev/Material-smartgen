@@ -55,6 +55,9 @@ class SmartGenEngine:
         static_dst = os.path.join(self.site_dir, 'static')
         if os.path.exists(static_src):
             shutil.copytree(static_src, static_dst)
+        license_src = os.path.join(self.docs_dir, 'LICENSE')
+        if os.path.exists(license_src):
+            shutil.copy2(license_src, os.path.join(self.site_dir, 'LICENSE'))
 
         nav = self.config.get('nav', [])
         self.page_sequence = []
@@ -107,8 +110,8 @@ class SmartGenEngine:
         current_depth = self.path_resolver.get_current_depth(relative_path)
         
         breadcrumbs = [
-            {"title": "Home", "link": self.path_resolver.get_breadcrumb_link("index.html", current_depth)},
-            {"title": title, "link": relative_path}
+            {"title": "Home", "link": self._relative_page_link(relative_path, "index.html")},
+            {"title": title, "link": os.path.basename(relative_path)}
         ]
 
         prev_page, next_page = None, None
@@ -117,10 +120,10 @@ class SmartGenEngine:
             if seq_path == md_path:
                 if i > 0:
                     p_title, p_path = sequence[i - 1]
-                    prev_page = {"title": p_title, "link": self.path_resolver.get_breadcrumb_link(p_path.replace('.md', '.html'), current_depth)}
+                    prev_page = {"title": p_title, "link": self._relative_page_link(relative_path, p_path.replace('.md', '.html'))}
                 if i < len(sequence) - 1:
                     n_title, n_path = sequence[i + 1]
-                    next_page = {"title": n_title, "link": self.path_resolver.get_breadcrumb_link(n_path.replace('.md', '.html'), current_depth)}
+                    next_page = {"title": n_title, "link": self._relative_page_link(relative_path, n_path.replace('.md', '.html'))}
                 break
 
         output_content = template.render(
@@ -135,7 +138,7 @@ class SmartGenEngine:
             next_page=next_page,
             current_depth=current_depth,
             path_resolver=self.path_resolver,
-            url_for=lambda type, filename: self._url_for(type, filename, current_depth)
+            url_for=lambda type, filename: self._url_for(type, filename, relative_path)
         )
 
         dst_path = os.path.join(self.site_dir, relative_path)
@@ -144,9 +147,16 @@ class SmartGenEngine:
         with open(dst_path, 'w', encoding='utf-8') as f:
             f.write(output_content)
 
-    def _url_for(self, type, filename, current_depth=0):
+    def _relative_page_link(self, current_page, target_page):
+        current_dir = os.path.dirname(current_page) or '.'
+        return os.path.relpath(target_page, current_dir).replace(os.sep, '/')
+
+    def _url_for(self, type, filename, current_page='index.html'):
         if type == 'static':
-            return self.path_resolver.resolve_static(filename, current_depth)
+            current_dir = os.path.dirname(current_page) or '.'
+            prefix = os.path.relpath('.', current_dir).replace(os.sep, '/')
+            static_root = f"{prefix}/static" if prefix != '.' else "static"
+            return f"{static_root}/{filename}"
         elif type == 'page':
-            return self.path_resolver.get_breadcrumb_link(filename, current_depth)
+            return self._relative_page_link(current_page, filename)
         return filename

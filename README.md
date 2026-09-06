@@ -9,7 +9,7 @@
 [![PyPI ready](https://img.shields.io/badge/install-pip-C2660D?style=flat-square)](#installation)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0B8F6B?style=flat-square)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-4A3AE3?style=flat-square)](requirements.txt)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-C2660D?style=flat-square)](showcase/community/contributing.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-C2660D?style=flat-square)](community/sponsor.md)
 
 [**Live Showcase**](https://bayeziddev.github.io/Material-smartgen/) · [Quick Start](#quick-start) · [Report an Issue](https://github.com/bayeziddev/Material-smartgen/issues)
 

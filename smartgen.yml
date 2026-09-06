@@ -67,6 +67,7 @@ extra:
 # Navigation structure tailored for Design & Showcase
 nav:
   - Home: index.md
+  - Community Sponsor: community/sponsor.md
 
   - Our Showcase:
       - Gallery Overview: showcase/index.md
