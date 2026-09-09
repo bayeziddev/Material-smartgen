@@ -22,7 +22,7 @@ copyright: Copyright &copy; 2026 Sayad Md Bayezid Hosan | Connect with Bayezid
 # Configuration
 theme:
   name: protfolio-one
-  manifest: protfolio-one/theme.yml
+  manifest: protfolio-one/smartgen-material.yml
   config: protfolio-one/runtime/theme.config.yml
   preview: protfolio-one/index.html
   palette:
