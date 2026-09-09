@@ -1,4 +1,4 @@
-name: Build and Deploy SmartGen Plugin System
+name: Deploy Portfolio One System
 
 on:
   push:
@@ -15,47 +15,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies with plugins
+      - name: Organize files for GitHub Pages
         run: |
-          python -m pip install --upgrade pip
-          # Apnar pyproject.toml er full ba required plugins dependencies install kora hocche
-          pip install "smartgen-docs[full]"
-
-      - name: Build complete site using SmartGen Engine
-        run: |
-          # Ekhane root directory theke apnar material config file target kora hocche
-          # Jodi config ti protfolio-one folder-er vitor thake, tahole path hobe 'protfolio-one/smartgen-material.yml'
-          python -c "from smartgen_docs.core import Builder; Builder(config_path='protfolio-one/smartgen-material.yml', site_dir='site').build()"
-
-      - name: Copy raw theme plugin assets to site
-        run: |
-          # Eta ensure korbe jate UI/UX, motion, ar runtime files gulo build directory-te thake
-          cp -r protfolio-one/runtime site/protfolio-one-runtime || true
-          cp -r protfolio-one/styles site/protfolio-one-styles || true
+          # Ekta clean public folder toiri kora hocche
+          mkdir -p public
+          
+          # protfolio-one folder-er shob kisu (runtime, styles, index.html) 'protfolio-one' namer subfolder-e rakha hocche
+          mkdir -p public/protfolio-one
+          cp -r protfolio-one/* public/protfolio-one/
+          
+          # Jate root URL (https://bayeziddev.github.io/Material-smartgen/) eo error na ase, tai ekta main index redirect ba copy die deya holo
+          cp protfolio-one/index.html public/index.html
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: upload-pages-artifact@v3
         with:
-          path: "site"
+          path: "public"
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
