@@ -1,8 +1,10 @@
-name: Deploy Portfolio One System
+name: Deploy Portfolio One Studio
 
 on:
   push:
     branches: ["main"]
+    paths:
+      - 'protfolio-one/**'
   workflow_dispatch:
 
 permissions:
@@ -21,20 +23,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Organize files for GitHub Pages
+      - name: Prepare build bundle
         run: |
-          # Ekta clean public folder toiri kora hocche
+          # Ekti clean public deployment folder toiri kora hocche
           mkdir -p public
           
-          # protfolio-one folder-er shob kisu (runtime, styles, index.html) 'protfolio-one' namer subfolder-e rakha hocche
-          mkdir -p public/protfolio-one
-          cp -r protfolio-one/* public/protfolio-one/
-          
-          # Jate root URL (https://bayeziddev.github.io/Material-smartgen/) eo error na ase, tai ekta main index redirect ba copy die deya holo
-          cp protfolio-one/index.html public/index.html
+          # protfolio-one folder er vitorer shob assets (index.html, styles.css, runtime, styles, script.js) sorasori public folder e copy kora hocche
+          cp -r protfolio-one/* public/
 
       - name: Upload artifact
-        uses: upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "public"
 
