@@ -1,10 +1,8 @@
-name: Deploy Portfolio One Studio
+name: Deploy Portfolio One Exactly
 
 on:
   push:
     branches: ["main"]
-    paths:
-      - 'protfolio-one/**'
   workflow_dispatch:
 
 permissions:
@@ -23,13 +21,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare build bundle
+      - name: Structure Directory for Exact HTML Path
         run: |
-          # Ekti clean public deployment folder toiri kora hocche
-          mkdir -p public
+          # Clean root public folder toiri kora hocche
+          mkdir -p public/protfolio-one
           
-          # protfolio-one folder er vitorer shob assets (index.html, styles.css, runtime, styles, script.js) sorasori public folder e copy kora hocche
-          cp -r protfolio-one/* public/
+          # protfolio-one folder er shob assets gulo sothik path-e copy kora hocche
+          cp -r protfolio-one/* public/protfolio-one/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
